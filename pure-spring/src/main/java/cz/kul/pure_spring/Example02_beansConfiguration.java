@@ -29,7 +29,7 @@ public class Example02_beansConfiguration {
       ctx.register(BeansConfiguration.class);
       ctx.refresh();
 
-      FileCompressor fc1 = ctx.getBean("fileCompression", FileCompressor.class);
+      FileCompressor fc1 = ctx.getBean("fileCompressor", FileCompressor.class);
       FileCompressor fc2 = ctx.getBean(FileCompressor.class);
       if (fc1 != fc2) {
         throw new RuntimeException("They should be identical.");
