@@ -1,5 +1,6 @@
 package cz.kul.jpa_introduction.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +13,7 @@ public class Customer {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
+//  @Column(name = "aaa", nullable = false, length = 255, unique = true)
   private String firstName;
 
   private String lastName;

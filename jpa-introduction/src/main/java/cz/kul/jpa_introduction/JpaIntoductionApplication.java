@@ -25,12 +25,13 @@ public class JpaIntoductionApplication implements CommandLineRunner {
 //		dbService.example03_getEntityById();
 //		dbService.example04_updateData();
 //		dbService.example05_updateData_doesNotWorkWhenUpdateOutOfSession();
+//		dbService.exampleX_delete();
 
 //		dbService.prepareMoviesData();
 //		dbService.example06_lazyLoading();
 //		dbService.example07_JPAQueries();
-		dbService.example08_joinFetch();
-//		dbService.example09_sqlQueries();
+//		dbService.example08_joinFetch();
+		dbService.example09_sqlQueries();
 
 
 	}

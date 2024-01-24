@@ -9,6 +9,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,22 +26,26 @@ public class DBService {
   @Autowired
   private PlatformTransactionManager transactionManager;
 
+  @Autowired
+  private ApplicationContext applicationContext;
+
+
   public void example01_nothing() {
   }
 
   @Transactional
-  public void example02_persistEntity() {
+  public void example02_persistEntity() {                             // CREATE
     Customer customer = new Customer("Pepa", "Novak");
     entityManager.persist(customer);
   }
 
-  public void example03_getEntityById() {
+  public void example03_getEntityById() {                               // READ
     Customer customer = entityManager.find(Customer.class, 1);
     System.out.println("The customer: " + customer);
   }
 
   @Transactional
-  public void example04_updateData() {
+  public void example04_updateData() {                                 // UPDATE
     Customer customer = entityManager.find(Customer.class, 1);
     customer.setFirstName("Karel");
     // NOTE: you does not have to save data manually, Hibernate detect changes
@@ -51,11 +56,25 @@ public class DBService {
     Customer customer = getCustomer(1L);
     customer.setFirstName("Martin");
     // NOTE: here it does not work because it is out of opened session
+
+    DBService dbService = applicationContext.getBean(DBService.class);
+    dbService.updateCustomer(customer);
   }
 
   @Transactional
   private Customer getCustomer(Long id) {
     return entityManager.find(Customer.class, id);
+  }
+
+  @Transactional
+  public void updateCustomer(Customer customer) {
+    entityManager.merge(customer);
+  }
+
+  @Transactional
+  public void exampleX_delete() {
+    Customer customer = entityManager.find(Customer.class, 1);
+    entityManager.remove(customer);
   }
 
   @Transactional
@@ -84,8 +103,13 @@ public class DBService {
 
   public void example06_lazyLoading() {
     TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-    Movie movie = transactionTemplate.execute(status ->
-        entityManager.find(Movie.class, 1L)
+
+    Movie movie = transactionTemplate.execute(status -> {
+          // ZACATEK TX
+          Movie m = entityManager.find(Movie.class, 1L);
+          return m;
+          // KONEC TX
+        }
     );
 
     // NOTE: the variable "country" contains lazy proxy, not the country object
@@ -136,17 +160,15 @@ public class DBService {
   public void example09_sqlQueries() {
     // Scalar queries
     System.out.println("Scalar query:");
-    List<Object[]> rows = entityManager
-        .createNativeQuery("SELECT m.id, m.name FROM movie m")
-        .getResultList();
+    Query nativeQuery = entityManager.createNativeQuery("SELECT m.id, m.name FROM movie as m");
+    List<Object[]> rows = nativeQuery.getResultList();
     for (Object[] row : rows) {
       System.out.printf("id: %s, name: %s\n", row[0], row[1]);
     }
 
     System.out.println("\nEntityQuery:");
-    List<Movie> movies = entityManager
-        .createNativeQuery("SELECT * from movie m", Movie.class)
-        .getResultList();
+    Query nativeQuery1 = entityManager.createNativeQuery("SELECT * from movie m", Movie.class);
+    List<Movie> movies = nativeQuery1.getResultList();
     for (Movie movie : movies) {
       System.out.println(movie);
     }
