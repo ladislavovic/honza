@@ -55,7 +55,7 @@ public class CsvServiceImpl implements CsvService
     private String createJson(final int rows, final int cells, final String[][] values)
     {
         StringBuilder result = new StringBuilder();
-        result.append("{\n[\n");
+        result.append("{\n\"rows\":[\n");
         for (int i = 1; i < rows; i++) {
             result.append("  {\n");
             for (int j = 0; j < cells; j++) {

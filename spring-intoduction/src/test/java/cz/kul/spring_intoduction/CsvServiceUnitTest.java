@@ -1,5 +1,7 @@
 package cz.kul.spring_intoduction;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.kul.spring_intoduction.services.CsvService;
 import cz.kul.spring_intoduction.services.CsvServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -9,7 +11,7 @@ public class CsvServiceUnitTest // unit test
 {
 
     @Test
-    void shouldConvertCsvToJson() {
+    void shouldConvertCsvToJson() throws Exception {
         CsvService csvService = new CsvServiceImpl();
         String json = csvService.csvToJson("""
             x,y,visible
@@ -18,7 +20,7 @@ public class CsvServiceUnitTest // unit test
             """);
         String expected = """
             {
-            [
+            "rows": [
               {
                 "x" : "1",
                 "y" : "2",
@@ -32,7 +34,7 @@ public class CsvServiceUnitTest // unit test
             ]
             }
             """;
-        Assertions.assertEquals(expected, json);
+        assertJsonEquals(expected, json);
     }
 
     @Test
@@ -59,6 +61,17 @@ public class CsvServiceUnitTest // unit test
             1,2
             """));
         Assertions.assertEquals("Number of cells in row 2 is different than number of cells in header.", exception.getMessage());
+    }
+
+    void assertJsonEquals(String expected, String actual) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode expectedJsonNode = objectMapper.readTree(expected);
+            JsonNode actualJsonNode = objectMapper.readTree(actual);
+            Assertions.assertEquals(expectedJsonNode, actualJsonNode);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 }
